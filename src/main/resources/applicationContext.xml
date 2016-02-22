@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="classpath:META-INF/spring/batchContext.xml"/>
+
+    <context:component-scan base-package="com.javaninja.batch"/>
+
+    <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+    <!--This repository is only really intended for use in testing and rapid prototyping-->
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"
+          p:transactionManager-ref="transactionManager"/>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
+          p:jobRepository-ref="jobRepository"/>
+
+
+
+    <bean id="fieldSetMapper" class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"
+          p:targetType="com.javaninja.batch.Car"/>
+
+    <bean id="delimitedLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"
+          p:names="make, model, color, doors"/>
+
+    <bean id="lineMapper" class="org.springframework.batch.item.file.mapping.DefaultLineMapper"
+          p:lineTokenizer-ref="delimitedLineTokenizer"
+          p:fieldSetMapper-ref="fieldSetMapper"/>
+
+    <!-- ItemReader which reads data from CSV file -->
+    <bean id="csvItemReader" class="org.springframework.batch.item.file.FlatFileItemReader"
+          p:resource="classpath:cars-input.xml"
+          p:lineMapper-ref="lineMapper"/>
+
+
+
+    <bean id="fieldExtractor" class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor"
+          p:names="make, model, color, doors"/>
+
+    <bean id="lineAggregator" class="org.springframework.batch.item.file.transform.DelimitedLineAggregator"
+          p:fieldExtractor-ref="fieldExtractor"/>
+
+    <!-- ItemWriter which writes the data in CSV format -->
+    <bean id="csvItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"
+          p:resource="file:csv/cars.xml"
+          p:lineAggregator-ref="lineAggregator"/>
+
+</beans>
