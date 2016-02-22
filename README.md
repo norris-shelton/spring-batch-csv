@@ -6,7 +6,7 @@ This is an example project that contains everything needed to use Spring Batch 3
 ### Spring Batch – reading and writing CSV
 This is a simple Spring Batch project. This implementation will read an CSV file and write an CSV file with almost no Java code.
 
-http://javaninja.net/2016/02/spring-batch-CSV/
+http://javaninja.net/2016/02/spring-batch-csv/
 
 
 ### Spring Batch Testing 
